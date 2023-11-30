@@ -57,6 +57,22 @@ public class RobotLocalService extends RpcLocalService implements IRobotService 
     }
 
     @Override
+    public void keyPress(int keyCode) {
+        System.out.println("key down");
+        // Press the key.
+        robot.keyPress(keyCode);
+        System.out.println("key down done");
+    }
+
+    @Override
+    public void keyRelease(int keyCode) {
+        System.out.println("key up");
+        // Release the key.
+        robot.keyRelease(keyCode);
+        System.out.println("key up done");
+    }
+
+    @Override
     public RpcResult handleRequest(int methodId, RpcBundle bundle) {
         // Create an empty RpcResult instance.
         RpcResult result = new RpcResult();
@@ -73,6 +89,14 @@ public class RobotLocalService extends RpcLocalService implements IRobotService 
 
             // Click the mouse.
             click(x, y, right);
+        } else if (methodId == METHOD_ID_KEY_PRESS) {
+            int keyCode = bundle.getInt("keyCode");
+
+            keyPress(keyCode);
+        } else if (methodId == METHOD_ID_KEY_RELEASE) {
+            int keyCode = bundle.getInt("keyCode");
+
+            keyRelease(keyCode);
         } else {
             throw new RuntimeException("Invalid method ID");
         }

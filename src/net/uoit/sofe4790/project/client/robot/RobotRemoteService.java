@@ -27,4 +27,22 @@ public class RobotRemoteService extends RpcRemoteService implements IRobotServic
 
         client.makeCall(target, SERVICE_ID, METHOD_ID_CLICK, bundle);
     }
+
+    @Override
+    public void keyPress(int keyCode) {
+        // Put the parameter into an input bundle.
+        RpcBundle bundle = new RpcBundle();
+        bundle.putInt("keyCode", keyCode);
+
+        client.makeCall(target, SERVICE_ID, METHOD_ID_KEY_PRESS, bundle);
+    }
+
+    @Override
+    public void keyRelease(int keyCode) {
+        // Put the parameter into an input bundle.
+        RpcBundle bundle = new RpcBundle();
+        bundle.putInt("keyCode", keyCode);
+
+        client.makeCall(target, SERVICE_ID, METHOD_ID_KEY_RELEASE, bundle);
+    }
 }
