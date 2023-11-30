@@ -30,7 +30,9 @@ public class FileLocalService extends RpcLocalService implements IFileService {
         File file = new File(path);
         File[] contents = file.listFiles();
 
-        assert contents != null;
+        if (contents == null) {
+            return new String[0];
+        }
 
         List<String> returnContents = new ArrayList<>();
 
@@ -54,7 +56,9 @@ public class FileLocalService extends RpcLocalService implements IFileService {
         File file = new File(path);
         File[] contents = file.listFiles();
 
-        assert contents != null;
+        if (contents == null) {
+            return new String[0];
+        }
 
         List<String> returnContents = new ArrayList<>();
 
