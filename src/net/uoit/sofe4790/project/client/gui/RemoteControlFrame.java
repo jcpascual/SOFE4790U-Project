@@ -5,7 +5,6 @@ import net.uoit.sofe4790.project.client.robot.IRobotService;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
