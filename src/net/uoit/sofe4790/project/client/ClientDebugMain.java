@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class ClientDebugMain {
     public static void main(String[] args) throws IOException, InterruptedException {
-        ClientHelper.instance.connect(args[0], 3500, "client");
+        ClientHelper.instance.connect(args[0], 3500);
 
         ClientHelper.instance.login("testuser", "testpassword", args[1]);
 

@@ -18,9 +18,9 @@ public class ClientHelper {
         client = null;
     }
 
-    public void connect(String host, int port, String localName) throws IOException {
+    public void connect(String host, int port) throws IOException {
         client = new RpcClient();
-        client.connect(host, port, localName);
+        client.connect(host, port);
 
         targetNode = -1;
     }

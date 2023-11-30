@@ -72,7 +72,7 @@ public class RpcClient {
         isConnected = false;
     }
 
-    public void connect(String host, int port, String localName) throws IOException {
+    public void connect(String host, int port) throws IOException {
         socketWrapper = new SocketWrapper(new Socket(host, port));
 
         new Thread(this::receiveLoop).start();

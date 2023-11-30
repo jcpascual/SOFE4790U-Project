@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class ClientMain {
     public static void main(String[] args) throws IOException, InterruptedException {
-        ClientHelper.instance.connect("127.0.0.1", 3500, "client");
+        ClientHelper.instance.connect("127.0.0.1", 3500);
 
         EventQueue.invokeLater(() -> {
             try {
