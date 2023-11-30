@@ -17,10 +17,14 @@ public class RemoteControlFrame extends JFrame {
     private JPanel contentPane;
     private boolean closing;
 
+    private IRobotService robotService;
+
     /**
      * Create the frame.
      */
     public RemoteControlFrame() {
+        robotService = (IRobotService) ClientHelper.instance.getTargetService(IRobotService.SERVICE_ID);
+
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setBounds(100, 100, 960, 540);
         contentPane = new JPanel();
@@ -32,8 +36,7 @@ public class RemoteControlFrame extends JFrame {
         label.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                IRobotService service = (IRobotService) ClientHelper.instance.getTargetService(IRobotService.SERVICE_ID);
-                service.click(e.getX(), e.getY(), SwingUtilities.isRightMouseButton(e));
+                robotService.click(e.getX(), e.getY(), SwingUtilities.isRightMouseButton(e));
             }
         });
 
@@ -55,11 +58,9 @@ public class RemoteControlFrame extends JFrame {
     }
 
     private void screenUpdateThread() {
-        IRobotService service = (IRobotService) ClientHelper.instance.getTargetService(IRobotService.SERVICE_ID);
-
         while (!closing) {
             try {
-                byte[] screenshot = service.getScreenshot();
+                byte[] screenshot = robotService.getScreenshot();
 
                 label.setIcon(new ImageIcon(screenshot));
 
