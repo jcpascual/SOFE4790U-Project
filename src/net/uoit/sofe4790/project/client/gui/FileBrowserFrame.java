@@ -32,10 +32,14 @@ public class FileBrowserFrame extends JFrame {
     private JPopupMenu popupMenuFolder;
     private JPopupMenu popupMenuFile;
 
+    private IFileService fileService;
+
     /**
      * Create the frame.
      */
     public FileBrowserFrame() {
+        fileService = (IFileService) ClientHelper.instance.getTargetService(IFileService.SERVICE_ID);
+
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setBounds(100, 100, 450, 300);
         contentPane = new JPanel();
@@ -133,8 +137,6 @@ public class FileBrowserFrame extends JFrame {
                     TreePath selectedPath = tree.getSelectionPath();
                     String selectedFsPath = createFileSystemPathFromTreePath(selectedPath);
 
-                    IFileService fileService = (IFileService) ClientHelper.instance.getTargetService(IFileService.SERVICE_ID);
-
                     try {
                         byte[] data = Files.readAllBytes(Path.of(file.getPath()));
                         fileService.putFile(selectedFsPath + file.getName(), data);
@@ -163,8 +165,6 @@ public class FileBrowserFrame extends JFrame {
                     TreePath selectedPath = tree.getSelectionPath();
                     String selectedFsPath = createFileSystemPathFromTreePath(selectedPath);
 
-                    IFileService fileService = (IFileService) ClientHelper.instance.getTargetService(IFileService.SERVICE_ID);
-
                     try {
                         byte[] data = fileService.getFile(selectedFsPath);
                         Files.write(Path.of(file.getPath()), data, StandardOpenOption.CREATE);
@@ -181,8 +181,6 @@ public class FileBrowserFrame extends JFrame {
 
     private void addChildrenToNode(DefaultMutableTreeNode parentTreeNode, String path) {
         parentTreeNode.removeAllChildren();
-
-        IFileService fileService = (IFileService) ClientHelper.instance.getTargetService(IFileService.SERVICE_ID);
 
         String[] directories = fileService.getDirectoriesInDirectory(path);
 
