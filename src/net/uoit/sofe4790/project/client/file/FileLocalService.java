@@ -13,8 +13,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileLocalService extends RpcLocalService implements IFileService {
+    private String performPathCorrectionForWindows(String path) {
+        String osName = System.getProperty("os.name");
+
+        if (!osName.contains("Windows")) {
+            return path;
+        }
+
+        return "C:" + path.replace('/', '\\');
+    }
+
     @Override
     public String[] getFilesInDirectory(String path) {
+        path = performPathCorrectionForWindows(path);
+
         File file = new File(path);
         File[] contents = file.listFiles();
 
@@ -37,6 +49,8 @@ public class FileLocalService extends RpcLocalService implements IFileService {
 
     @Override
     public String[] getDirectoriesInDirectory(String path) {
+        path = performPathCorrectionForWindows(path);
+
         File file = new File(path);
         File[] contents = file.listFiles();
 
@@ -59,11 +73,15 @@ public class FileLocalService extends RpcLocalService implements IFileService {
 
     @Override
     public byte[] getFile(String path) throws IOException {
+        path = performPathCorrectionForWindows(path);
+
         return Files.readAllBytes(Path.of(path));
     }
 
     @Override
     public void putFile(String path, byte[] data) throws IOException {
+        path = performPathCorrectionForWindows(path);
+
         Files.write(Path.of(path), data, StandardOpenOption.CREATE);
     }
 
