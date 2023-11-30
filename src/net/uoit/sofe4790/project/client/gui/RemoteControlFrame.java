@@ -34,8 +34,18 @@ public class RemoteControlFrame extends JFrame {
         label = new JLabel();
         label.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                robotService.click(e.getX(), e.getY(), SwingUtilities.isRightMouseButton(e));
+            public void mousePressed(MouseEvent e) {
+                robotService.mouseDown(e.getX(), e.getY(), SwingUtilities.isRightMouseButton(e));
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                robotService.mouseUp(SwingUtilities.isRightMouseButton(e));
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                robotService.mouseDrag(e.getX(), e.getY());
             }
         });
 
@@ -75,7 +85,7 @@ public class RemoteControlFrame extends JFrame {
 
                 label.setIcon(new ImageIcon(screenshot));
 
-                Thread.sleep(500);
+                Thread.sleep(250);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

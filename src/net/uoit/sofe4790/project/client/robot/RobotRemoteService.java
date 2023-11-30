@@ -18,17 +18,6 @@ public class RobotRemoteService extends RpcRemoteService implements IRobotServic
     }
 
     @Override
-    public void click(int x, int y, boolean right) {
-        // Put the parameters into an input bundle.
-        RpcBundle bundle = new RpcBundle();
-        bundle.putInt("x", x);
-        bundle.putInt("y", y);
-        bundle.putBoolean("right", right);
-
-        client.makeCall(target, SERVICE_ID, METHOD_ID_CLICK, bundle);
-    }
-
-    @Override
     public void keyPress(int keyCode) {
         // Put the parameter into an input bundle.
         RpcBundle bundle = new RpcBundle();
@@ -44,5 +33,35 @@ public class RobotRemoteService extends RpcRemoteService implements IRobotServic
         bundle.putInt("keyCode", keyCode);
 
         client.makeCall(target, SERVICE_ID, METHOD_ID_KEY_RELEASE, bundle);
+    }
+
+    @Override
+    public void mouseDown(int x, int y, boolean right) {
+        // Put the parameters into an input bundle.
+        RpcBundle bundle = new RpcBundle();
+        bundle.putInt("x", x);
+        bundle.putInt("y", y);
+        bundle.putBoolean("right", right);
+
+        client.makeCall(target, SERVICE_ID, METHOD_ID_MOUSE_DOWN, bundle);
+    }
+
+    @Override
+    public void mouseUp(boolean right) {
+        // Put the parameter into an input bundle.
+        RpcBundle bundle = new RpcBundle();
+        bundle.putBoolean("right", right);
+
+        client.makeCall(target, SERVICE_ID, METHOD_ID_MOUSE_UP, bundle);
+    }
+
+    @Override
+    public void mouseDrag(int x, int y) {
+        // Put the parameters into an input bundle.
+        RpcBundle bundle = new RpcBundle();
+        bundle.putInt("x", x);
+        bundle.putInt("y", y);
+
+        client.makeCall(target, SERVICE_ID, METHOD_ID_MOUSE_DRAG, bundle);
     }
 }

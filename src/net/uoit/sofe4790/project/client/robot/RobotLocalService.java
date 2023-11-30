@@ -44,19 +44,6 @@ public class RobotLocalService extends RpcLocalService implements IRobotService 
     }
 
     @Override
-    public void click(int x, int y, boolean right) {
-        // Move the mouse to these coordinates.
-        robot.mouseMove(x, y);
-
-        // Choose the right mask.
-        int mask = right ? InputEvent.BUTTON2_DOWN_MASK : InputEvent.BUTTON1_DOWN_MASK;
-
-        // Press the mouse button and release it.
-        robot.mousePress(mask);
-        robot.mouseRelease(mask);
-    }
-
-    @Override
     public void keyPress(int keyCode) {
         // Press the key.
         robot.keyPress(keyCode);
@@ -69,6 +56,33 @@ public class RobotLocalService extends RpcLocalService implements IRobotService 
     }
 
     @Override
+    public void mouseDown(int x, int y, boolean right) {
+        // Move the mouse to these coordinates.
+        robot.mouseMove(x, y);
+
+        // Choose the right mask.
+        int mask = right ? InputEvent.BUTTON2_DOWN_MASK : InputEvent.BUTTON1_DOWN_MASK;
+
+        // Press the mouse button.
+        robot.mousePress(mask);
+    }
+
+    @Override
+    public void mouseUp(boolean right) {
+        // Choose the right mask.
+        int mask = right ? InputEvent.BUTTON2_DOWN_MASK : InputEvent.BUTTON1_DOWN_MASK;
+
+        // Release the mouse button.
+        robot.mouseRelease(mask);
+    }
+
+    @Override
+    public void mouseDrag(int x, int y) {
+        // Move the mouse to these coordinates.
+        robot.mouseMove(x, y);
+    }
+
+    @Override
     public RpcResult handleRequest(int methodId, RpcBundle bundle) {
         // Create an empty RpcResult instance.
         RpcResult result = new RpcResult();
@@ -77,14 +91,6 @@ public class RobotLocalService extends RpcLocalService implements IRobotService 
         if (methodId == METHOD_ID_GET_SCREENSHOT) {
             // Take a screenshot and put the result into the result bundle.
             result.bundle.putByteArray(RETURN_VALUE, getScreenshot());
-        } else if (methodId == METHOD_ID_CLICK) {
-            // Get the parameters from the input bundle.
-            int x = bundle.getInt("x");
-            int y = bundle.getInt("y");
-            boolean right = bundle.getBoolean("right");
-
-            // Click the mouse.
-            click(x, y, right);
         } else if (methodId == METHOD_ID_KEY_PRESS) {
             int keyCode = bundle.getInt("keyCode");
 
@@ -93,6 +99,27 @@ public class RobotLocalService extends RpcLocalService implements IRobotService 
             int keyCode = bundle.getInt("keyCode");
 
             keyRelease(keyCode);
+        } else if (methodId == METHOD_ID_MOUSE_DOWN) {
+            // Get the parameters from the input bundle.
+            int x = bundle.getInt("x");
+            int y = bundle.getInt("y");
+            boolean right = bundle.getBoolean("right");
+
+            // Click the mouse button.
+            mouseDown(x, y, right);
+        } else if (methodId == METHOD_ID_MOUSE_UP) {
+            // Get the parameters from the input bundle.
+            boolean right = bundle.getBoolean("right");
+
+            // Release the mouse button.
+            mouseUp(right);
+        } else if (methodId == METHOD_ID_MOUSE_DRAG) {
+            // Get the parameters from the input bundle.
+            int x = bundle.getInt("x");
+            int y = bundle.getInt("y");
+
+            // Drag the mouse.
+            mouseDrag(x, y);
         } else {
             throw new RuntimeException("Invalid method ID");
         }
