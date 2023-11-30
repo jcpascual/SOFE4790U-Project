@@ -38,7 +38,12 @@ public class NodeChooserFrame extends JFrame {
 
                 // Change the target node if an item is selected.
                 if (index != -1) {
-                    ClientHelper.instance.setTargetNode(index);
+                    for (RpcRemoteNode node : ClientHelper.instance.getNodes().values()) {
+                        if (node.name.equals(comboBoxNodes.getSelectedItem())) {
+                            ClientHelper.instance.setTargetNode(node.id);
+                            break;
+                        }
+                    }
                 }
             }
         });
