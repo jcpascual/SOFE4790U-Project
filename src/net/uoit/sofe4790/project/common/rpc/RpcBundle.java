@@ -17,6 +17,8 @@ public class RpcBundle {
 
     private final Map<String, Object> values;
 
+    // Getters and setters.
+
     public RpcBundle() {
         values = new HashMap<>();
     }
@@ -61,17 +63,23 @@ public class RpcBundle {
         values.put(key, value);
     }
 
+    // Serialization.
+
     public byte[] serialize() throws IOException {
         ByteArrayOutputStream innerStream = new ByteArrayOutputStream();
         DataOutputStream outerStream = new DataOutputStream(innerStream);
 
+        // Write the number of key-value pairs.
         outerStream.writeInt(values.size());
 
+        // Write each key to the output.
         for (String key : values.keySet()) {
             Object value = values.get(key);
 
+            // Write the key's name.
             DataStreamExtensions.writeUtf8String(outerStream, key);
 
+            // Write the value.
             if (value instanceof Integer) {
                 outerStream.write(SERIALIZED_TYPE_INT);
                 outerStream.writeInt((Integer)value);
@@ -86,8 +94,10 @@ public class RpcBundle {
 
                 String[] valCast = (String[]) value;
 
+                // Write the array length.
                 outerStream.writeInt(valCast.length);
 
+                // Write each element.
                 for (String str : valCast) {
                     DataStreamExtensions.writeUtf8String(outerStream, str);
                 }
@@ -96,7 +106,10 @@ public class RpcBundle {
 
                 byte[] valCast = (byte[])value;
 
+                // Write the array length.
                 outerStream.writeInt(valCast.length);
+
+                // Write all the bytes.
                 outerStream.write(valCast);
             } else {
                 throw new RuntimeException("Invalid type");
@@ -107,6 +120,7 @@ public class RpcBundle {
     }
 
     public static RpcBundle deserialize(byte[] data) throws IOException {
+        // Create a new ByteArrayInputStream using the byte array as the input.
         ByteArrayInputStream innerStream = new ByteArrayInputStream(data);
         return deserialize(innerStream);
     }
@@ -116,14 +130,19 @@ public class RpcBundle {
 
         RpcBundle bundle = new RpcBundle();
 
+        // Get the number of key-value pairs.
         int size = outerStream.readInt();
 
+        // Read each pair.
         for (int i = 0; i < size; i++) {
+            // Read the key.
             String key = DataStreamExtensions.readUtf8String(outerStream);
             Object value;
 
+            // Read the value type.
             int type = outerStream.read();
 
+            // Read the value.
             if (type == SERIALIZED_TYPE_INT) {
                 value = outerStream.readInt();
             } else if (type == SERIALIZED_TYPE_STRING) {
@@ -148,6 +167,7 @@ public class RpcBundle {
                 throw new RuntimeException("Invalid type");
             }
 
+            // Store the pair in the reconstructed bundle.
             bundle.values.put(key, value);
         }
 
