@@ -75,12 +75,15 @@ public class RpcClient {
     public void connect(String host, int port) throws IOException {
         socketWrapper = new SocketWrapper(new Socket(host, port));
 
+        // Start the receive loop. This will handle receiving packets.
         new Thread(this::receiveLoop).start();
 
+        // Start the send loop. This will handle sending packets.
         new Thread(this::sendLoop).start();
     }
 
     public void login(String username, String password, String name) throws IOException {
+        // Construct a LoginRequestMessage with the parameters and send it.
         LoginRequestMessage loginMessage = new LoginRequestMessage();
         loginMessage.username = username;
         loginMessage.password = password;
@@ -92,8 +95,10 @@ public class RpcClient {
     private void receiveLoop() {
         try {
             while (true) {
+                // Receive a message from the server.
                 Message message = socketWrapper.readMessage();
 
+                // Handle it appropriately.
                 if (message instanceof LoginResponseSuccessMessage loginResponseSuccessMessage) {
                     handleLoginSuccess(loginResponseSuccessMessage);
                 } else if (message instanceof LoginResponseFailMessage loginResponseFailMessage) {
@@ -116,13 +121,16 @@ public class RpcClient {
     private void sendLoop() {
         try {
             while (true) {
+                // Acquire the send queue lock.
                 synchronized (sendQueueLock) {
+                    // Send all messages in the queue.
                     Message message;
                     while ((message = sendQueue.poll()) != null) {
                         socketWrapper.sendMessage(message);
                     }
                 }
 
+                // Run this code at 50 Hz.
                 Thread.sleep(1000 / 50);
             }
         } catch (Exception e) {
@@ -131,6 +139,7 @@ public class RpcClient {
     }
 
     private void handleLoginSuccess(LoginResponseSuccessMessage successMessage) {
+        // Populate the nodes list.
         synchronized (remoteNodesLock) {
             for (RpcNodeInfo nodeInfo : successMessage.connectedNodes) {
                 remoteNodes.put(nodeInfo.id, new RpcRemoteNode(nodeInfo.id, nodeInfo.name, this));
@@ -139,6 +148,7 @@ public class RpcClient {
 
         isConnected = true;
 
+        // Execute the callback.
         if (loginSuccessCallback != null) {
             loginSuccessCallback.accept(successMessage);
         }
@@ -147,6 +157,7 @@ public class RpcClient {
     }
 
     private void handleLoginFailure(LoginResponseFailMessage failMessage) {
+        // Execute the callback.
         if (loginFailCallback != null) {
             loginFailCallback.accept(failMessage);
         }
@@ -155,10 +166,12 @@ public class RpcClient {
     private void handleNodeConnect(NodeConnectMessage connectMessage) {
         RpcNodeInfo nodeInfo = connectMessage.nodeInfo;
 
+        // Add this new node to the nodes list.
         synchronized (remoteNodesLock) {
             remoteNodes.put(nodeInfo.id, new RpcRemoteNode(nodeInfo.id, nodeInfo.name, this));
         }
 
+        // Execute the callback.
         if (nodeConnectCallback != null) {
             nodeConnectCallback.accept(null);
         }
@@ -169,10 +182,12 @@ public class RpcClient {
     private void handleNodeDisconnect(NodeDisconnectMessage disconnectMessage) {
         RpcNodeInfo nodeInfo = disconnectMessage.nodeInfo;
 
+        // Remove the node from the nodes list.
         synchronized (remoteNodesLock) {
             remoteNodes.remove(nodeInfo.id);
         }
 
+        // Execute the callback.
         if (nodeDisconnectCallback != null) {
             nodeDisconnectCallback.accept(null);
         }
@@ -181,10 +196,13 @@ public class RpcClient {
     }
 
     private void handleRequest(RpcRequestMessage requestMessage) {
+        // Get the requested service.
         RpcLocalService localService = localServices.get(requestMessage.serviceId);
 
+        // Execute the requested method.
         RpcResult result = localService.handleRequest(requestMessage.methodId, requestMessage.bundle);
 
+        // Construct a response message and send it.
         RpcResponseMessage responseMessage = new RpcResponseMessage();
         responseMessage.targetClient = requestMessage.sourceClient;
         responseMessage.callId = requestMessage.callId;
@@ -198,14 +216,17 @@ public class RpcClient {
     private void handleResponse(RpcResponseMessage responseMessage) {
         CompletableFuture<RpcResult> future;
 
+        // Get the CompletableFuture corresponding to the call ID.
         synchronized (outstandingCallsLock) {
             future = outstandingCalls.remove(responseMessage.callId);
         }
 
+        // Set the result on the CompletableFuture.
         future.complete(responseMessage.result);
     }
 
     public RpcResult makeCall(int targetClient, int serviceId, int methodId, RpcBundle bundle) {
+        // Construct a request message.
         RpcRequestMessage requestMessage = new RpcRequestMessage();
         requestMessage.sourceClient = 0xFF;
         requestMessage.targetClient = targetClient;
@@ -215,6 +236,7 @@ public class RpcClient {
 
         CompletableFuture<RpcResult> future = new CompletableFuture<>();
 
+        // Create a unique call ID and put the CompletableFuture in the outstanding calls dictionary.
         synchronized (outstandingCallsLock) {
             int callId = callCount++;
 
@@ -224,10 +246,12 @@ public class RpcClient {
         }
 
         try {
+            // Send the request message.
             synchronized (sendLock) {
                 socketWrapper.sendMessage(requestMessage);
             }
 
+            // Wait until the future has a result, and set it.
             return future.get();
         } catch (IOException | ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
@@ -242,7 +266,8 @@ public class RpcClient {
 
     public HashMap<Integer, RpcRemoteNode> getNodes() {
         HashMap<Integer, RpcRemoteNode> copiedNodes;
-        
+
+        // Create a copy of the nodes list.
         synchronized (remoteNodesLock) {
             copiedNodes = new HashMap<Integer, RpcRemoteNode>(remoteNodes);
         }
