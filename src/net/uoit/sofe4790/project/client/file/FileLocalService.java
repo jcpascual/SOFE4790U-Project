@@ -14,12 +14,15 @@ import java.util.List;
 
 public class FileLocalService extends RpcLocalService implements IFileService {
     private String performPathCorrectionForWindows(String path) {
+        // Get the OS name.
         String osName = System.getProperty("os.name");
 
+        // If not Windows, just return the path.
         if (!osName.contains("Windows")) {
             return path;
         }
 
+        // If it is Windows, use backslashes as the path separator and add a drive letter.
         return "C:" + path.replace('/', '\\');
     }
 
@@ -27,15 +30,18 @@ public class FileLocalService extends RpcLocalService implements IFileService {
     public String[] getFilesInDirectory(String path) {
         path = performPathCorrectionForWindows(path);
 
+        // Get all files in this path.
         File file = new File(path);
         File[] contents = file.listFiles();
 
+        // If empty, return a zero-length array.
         if (contents == null) {
             return new String[0];
         }
 
         List<String> returnContents = new ArrayList<>();
 
+        // Record all the regular files.
         for (int i = 0; i < contents.length; i++) {
             File content = contents[i];
 
@@ -53,15 +59,18 @@ public class FileLocalService extends RpcLocalService implements IFileService {
     public String[] getDirectoriesInDirectory(String path) {
         path = performPathCorrectionForWindows(path);
 
+        // Get all files in this path.
         File file = new File(path);
         File[] contents = file.listFiles();
 
+        // If empty, return a zero-length array.
         if (contents == null) {
             return new String[0];
         }
 
         List<String> returnContents = new ArrayList<>();
 
+        // Record all the directories.
         for (int i = 0; i < contents.length; i++) {
             File content = contents[i];
 
@@ -79,6 +88,7 @@ public class FileLocalService extends RpcLocalService implements IFileService {
     public byte[] getFile(String path) throws IOException {
         path = performPathCorrectionForWindows(path);
 
+        // Return all bytes of the file in this path.
         return Files.readAllBytes(Path.of(path));
     }
 
@@ -86,6 +96,7 @@ public class FileLocalService extends RpcLocalService implements IFileService {
     public void putFile(String path, byte[] data) throws IOException {
         path = performPathCorrectionForWindows(path);
 
+        // Write the byte array to a new file at this path.
         Files.write(Path.of(path), data, StandardOpenOption.CREATE);
     }
 
@@ -93,6 +104,7 @@ public class FileLocalService extends RpcLocalService implements IFileService {
     public void makeFolder(String path) throws IOException {
         path = performPathCorrectionForWindows(path);
 
+        // Create a folder at this path.
         Files.createDirectory(Path.of(path));
     }
 
