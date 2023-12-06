@@ -114,11 +114,13 @@ public class FileLocalService extends RpcLocalService implements IFileService {
         result.success = true;
 
         if (methodId == METHOD_ID_GET_FILES_IN_DIRECTORY) {
+            // Get all the files in the requested path and put it in the return bundle.
             String path = bundle.getString("path");
             String[] returnValue = getFilesInDirectory(path);
 
             result.bundle.putStringArray(RETURN_VALUE, returnValue);
         } else if (methodId == METHOD_ID_GET_DIRECTORIES_IN_DIRECTORY) {
+            // Get all the directories in the requested path and put it in the return bundle.
             String path = bundle.getString("path");
             String[] returnValue = getDirectoriesInDirectory(path);
 
@@ -126,6 +128,7 @@ public class FileLocalService extends RpcLocalService implements IFileService {
         } else if (methodId == METHOD_ID_GET_FILE) {
             String path = bundle.getString("path");
 
+            // Get the file's data and store it in the return bundle.
             byte[] returnValue;
             try {
                 returnValue = getFile(path);
@@ -140,6 +143,7 @@ public class FileLocalService extends RpcLocalService implements IFileService {
             String path = bundle.getString("path");
             byte[] data = bundle.getByteArray("data");
 
+            // Store the requested data into the requested path.
             try {
                 putFile(path, data);
             } catch (IOException e) {
