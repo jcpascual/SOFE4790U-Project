@@ -46,13 +46,21 @@ public class RobotLocalService extends RpcLocalService implements IRobotService 
     @Override
     public void keyPress(int keyCode) {
         // Press the key.
-        robot.keyPress(keyCode);
+        try {
+            robot.keyPress(keyCode);
+        } catch (IllegalArgumentException e) {
+            // Do nothing.
+        }
     }
 
     @Override
     public void keyRelease(int keyCode) {
         // Release the key.
-        robot.keyRelease(keyCode);
+        try {
+            robot.keyRelease(keyCode);
+        } catch (IllegalArgumentException e) {
+            // Do nothing.
+        }
     }
 
     @Override
