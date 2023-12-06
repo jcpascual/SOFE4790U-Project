@@ -6,9 +6,11 @@ import java.awt.*;
 import java.io.IOException;
 
 public class ClientMain {
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException {
+        // Connect to the server.
         ClientHelper.instance.connect(args[0], 3500);
 
+        // Create the LoginFrame.
         EventQueue.invokeLater(() -> {
             try {
                 LoginFrame frame = new LoginFrame();
