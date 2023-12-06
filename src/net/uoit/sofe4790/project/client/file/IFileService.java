@@ -9,6 +9,7 @@ public interface IFileService {
     int METHOD_ID_GET_DIRECTORIES_IN_DIRECTORY = 2;
     int METHOD_ID_GET_FILE = 3;
     int METHOD_ID_PUT_FILE = 4;
+    int METHOD_ID_CREATE_FOLDER = 5;
 
     String RETURN_VALUE = "ret";
 
@@ -19,4 +20,6 @@ public interface IFileService {
     byte[] getFile(String path) throws IOException;
 
     void putFile(String parentPath, byte[] data) throws IOException;
+
+    void makeFolder(String path) throws IOException;
 }

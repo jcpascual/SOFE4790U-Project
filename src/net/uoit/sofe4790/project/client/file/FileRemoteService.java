@@ -50,4 +50,12 @@ public class FileRemoteService extends RpcRemoteService implements IFileService 
 
         client.makeCall(target, SERVICE_ID, METHOD_ID_PUT_FILE, bundle);
     }
+
+    @Override
+    public void makeFolder(String path) throws IOException {
+        RpcBundle bundle = new RpcBundle();
+        bundle.putString("path", path);
+
+        client.makeCall(target, SERVICE_ID, METHOD_ID_CREATE_FOLDER, bundle);
+    }
 }

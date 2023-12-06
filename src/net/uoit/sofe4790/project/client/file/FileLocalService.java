@@ -90,6 +90,13 @@ public class FileLocalService extends RpcLocalService implements IFileService {
     }
 
     @Override
+    public void makeFolder(String path) throws IOException {
+        path = performPathCorrectionForWindows(path);
+
+        Files.createDirectory(Path.of(path));
+    }
+
+    @Override
     public RpcResult handleRequest(int methodId, RpcBundle bundle) {
         RpcResult result = new RpcResult();
         result.success = true;
